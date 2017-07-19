@@ -3,82 +3,136 @@
   <head>
     <title>Socket.IO chat</title>
     <style>
-      /* * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { font: 13px Helvetica, Arial; }
-      form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
-      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
-      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
-      #messages { list-style-type: none; margin: 0; padding: 0; }
-      #messages li { padding: 5px 10px; }
-      #messages li:nth-child(odd) { background: #eee; } */
+        path {
+            fill: none;
+            stroke: #aaa;
+        }
     </style>
   </head>
   <body>
-    <div id="app"></div>
+    <!-- <div id="app"></div> -->
+    <!-- <svg width="1000" height="100">
+		<path transform="translate(200, 0)" />
+	</svg> -->
     <!-- <ul id="messages"></ul>
     <form action="">
       <input id="m" autocomplete="off" /><button>Send</button>
     </form> -->
     <script src="/socket.io/socket.io.js"></script>
     <script src="//code.jquery.com/jquery-1.11.1.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/d3/4.10.0/d3.min.js"></script>
+    <script src="//d3js.org/d3.v3.min.js"></script>
     <script>
         $(function(){
             var socket = io('http://ec2-34-212-134-187.us-west-2.compute.amazonaws.com:9090');
             socket.on('widget:data', function(data){
                 //console.log(data);
                 var entries = JSON.parse(data.message).Root.BinaryInSet.Entry;
-                console.log(entries[0]);
-                // console.log(entries[1]);
-                // console.log(entries[2]);
-                // console.log(entries[3]);
-                //$('#messages').append($('<li>').text(msg));
+                // console.log(entries[0]);
+                // entries.forEach(function(Entry) {
+                //     console.log(Entry);
+                // }, entries);
             });
 
-            var svgContainer = d3.select("#app").append("svg")
+
+            var data = [[480, 200],[580, 400],[680, 100],[780, 300],[180, 300],[280, 100],[380, 400]];
+            // var data = [[180, 400], [580, 400],[680, 400],[480, 400], [780, 400],[280, 400],[380, 400]];
+            var svg = d3.select("body").append("svg")
                 .attr("width", 960)
-                .attr("height", 400);
+                .attr("height", 500);
+            // var lineGenerator = d3.line();
+            // // var circleGenerator = d3.circle();
+            // var pathString = lineGenerator(data);
 
-                //Draw the line
-            var circle = svgContainer.append("line")
-                    .attr("x1", 0)
-                    .attr("y1", 200)
-                    .attr("x2", 600)
-                    .attr("y2", 200)
-                    .attr("stroke-width", 1)
-                    .attr("stroke", "black");
+            // d3.select('path')
+            //     .attr('d', pathString);
 
-            var circle1 = svgContainer.append("circle")
-                    .attr("cx", 5)
-                    .attr("cy", 200)
-                    .attr('fill', 'white')
-                    .attr("stroke-width", 1)
-                    .attr("stroke", "black")
-                    .attr("r", 5);
+            var path = svg.append("path")
+                .data([data])
+                .attr("d", d3.svg.line()); // Catmull–Rom
+                    // .interpolate("cardinal-closed"));
 
-            var circle2 = svgContainer.append("circle")
-                    .attr("cx", 200)
-                    .attr("cy", 200)
-                    .attr('fill', 'white')
-                    .attr("stroke-width", 1)
-                    .attr("stroke", "black")
-                    .attr("r", 5);
-            
-            var circle3 = svgContainer.append("circle")
-                    .attr("cx", 400)
-                    .attr("cy", 200)
-                    .attr("r", 5)
-                    .attr("stroke-width", 1)
-                    .attr("stroke", "black")
-                    .attr('fill', 'white');
+            svg.selectAll(".point")
+                .data(data)
+                .enter().append("circle")
+                .attr("r", 4)
+                .attr("transform", function(d) { return "translate(" + d + ")"; });
 
-            var circle4 = svgContainer.append("circle")
-                    .attr("cx", 600)
-                    .attr("cy", 200)
-                    .attr("r", 5)
-                    .attr("stroke-width", 1)
-                    .attr("stroke", "black")
-                    .attr('fill', 'white');
+            var circle = svg.append("circle")
+                .attr("r", 13)
+                .attr("transform", "translate(" + data[0] + ")");
+            transition();
+            function transition() {
+                circle.transition()
+                    .duration(10000)
+                    .attrTween("transform", translateAlong(path.node()))
+                    .each("end", transition);
+            }
+
+            // Returns an attrTween for translating along the specified path element.
+            function translateAlong(path) {
+                var l = path.getTotalLength();
+                return function(d, i, a) {
+                    return function(t) {
+                    var p = path.getPointAtLength(t * l);
+                    return "translate(" + p.x + "," + p.y + ")";
+                    };
+                };
+            }
+
+            // var points = [
+            //     [480, 200],
+            //     [580, 400],
+            //     [680, 100],
+            //     [780, 300],
+            //     [180, 300],
+            //     [280, 100],
+            //     [380, 400]
+            // ];
+
+            // var svgContainer = d3.select("#app").append("svg")
+            //     .attr("width", 960)
+            //     .attr("height", 400);
+
+            // //Draw the line
+            // var circle = svgContainer.append("line")
+            //         .attr("x1", 0)
+            //         .attr("y1", 200)
+            //         .attr("x2", 600)
+            //         .attr("y2", 200)
+            //         .attr("stroke-width", 1)
+            //         .attr("stroke", "black");
+
+            // var circle1 = svgContainer.append("circle")
+            //         .attr("cx", 5)
+            //         .attr("cy", 200)
+            //         .attr('fill', 'white')
+            //         .attr("stroke-width", 1)
+            //         .attr("stroke", "black")
+            //         .attr("r", 5);
+
+            // var circle2 = svgContainer.append("circle")
+            //         .attr("cx", 200)
+            //         .attr("cy", 200)
+            //         .attr('fill', 'white')
+            //         .attr("stroke-width", 1)
+            //         .attr("stroke", "black")
+            //         .attr("r", 5);
+        
+            // var circle3 = svgContainer.append("circle")
+            //         .attr("cx", 400)
+            //         .attr("cy", 200)
+            //         .attr("r", 5)
+            //         .attr("stroke-width", 1)
+            //         .attr("stroke", "black")
+            //         .attr('fill', 'white');
+
+            // var circle4 = svgContainer.append("circle")
+            //         .attr("cx", 600)
+            //         .attr("cy", 200)
+            //         .attr("r", 5)
+            //         .attr("stroke-width", 1)
+            //         .attr("stroke", "black")
+            //         .attr('fill', 'white');
         });
     </script>
   </body>
