@@ -27,10 +27,13 @@
             socket.on('widget:data', function(data){
                 //console.log(data);
                 var entries = JSON.parse(data.message).Root.BinaryInSet.Entry;
-                // console.log(entries[0]);
-                // entries.forEach(function(Entry) {
-                //     console.log(Entry);
-                // }, entries);
+                // console.log(entries);
+                entries.forEach(function(Entry) {
+                    //console.log(Entry.Value);
+                    if(Entry.Value == 1) {
+                        console.log(Entry);
+                    }
+                });
             });
 
 
