@@ -39,13 +39,13 @@
                 entries.forEach(function(Entry) {
                     //console.log(Entry.Value);
                     if(Entry.Value == 1) {
-                        console.log(Entry);
+                        //console.log(Entry);
                     }
                 });
             });
 
 
-            var data = [[180, 400], [280, 400], [380, 400],[480, 400],[580, 400],[680, 400],[780, 400]];
+            var data = [[180, 200], [280, 200], [380, 200],[480, 200],[580, 200],[680, 200],[780, 200]];
             var svg = d3.select("body").append("svg")
                 .attr("width", 960)
                 .attr("height", 500);
@@ -64,28 +64,6 @@
             var circle = svg.append("circle")
                 .attr("r", 5)
                 .attr("transform", "translate(" + data[0] + ")")
-                
-            
-            // transition();
-            function transition(step) {
-                circle.transition()
-                    .duration(3000)
-                    .attrTween("transform", translateAlong(path.node()))
-                    // .each("end", transition)
-                    .each("end", function() {setInterval(ping, 500);})
-                    .each("start", function() {clearInterval(ping, 500);});
-            }
-
-            // Returns an attrTween for translating along the specified path element.
-            function translateAlong(path) {
-                var l = path.getTotalLength();
-                return function(d, i, a) {
-                    return function(t) {
-                        var p = path.getPointAtLength(t * l);
-                    return "translate(" + p.x + "," + p.y + ")";
-                    };
-                };
-            }
 
             function ping() {
                 var translate = d3.transform(circle.attr('transform'));
@@ -104,7 +82,7 @@
                     .duration(3000)
                     .attr({
                         'fill': 'none',
-                        'r': 60,
+                        'r': 35,
                         'stroke': '#369',
                         'stroke-width': '0px',
                         'stroke-opacity': 0,
@@ -112,6 +90,8 @@
                     })
                 };
                 var pingInterval = setInterval(ping, 300);
+
+                //circle.transition().duration(1000).ease("linear").attr("transform", "translate(180, 200)")
         });
     </script>
   </body>
