@@ -7,10 +7,14 @@
             fill: none;
             stroke: #aaa;
         }
+        .start {
+            border: 1px solid #000;
+            padding: 5px 10px;
+        }
     </style>
   </head>
   <body>
-    <!-- <div id="app"></div> -->
+     <div id="app"><a class="start">Start</a></div> 
     <!-- <svg width="1000" height="100">
 		<path transform="translate(200, 0)" />
 	</svg> -->
@@ -23,11 +27,15 @@
     <script src="//d3js.org/d3.v3.min.js"></script>
     <script>
         $(function(){
+            var setp = 1;
+            $('a.start').click(function(){
+                clearInterval(pingInterval);
+                transition(setp);
+            });
+
             var socket = io('http://ec2-34-212-134-187.us-west-2.compute.amazonaws.com:9090');
             socket.on('widget:data', function(data){
-                //console.log(data);
                 var entries = JSON.parse(data.message).Root.BinaryInSet.Entry;
-                // console.log(entries);
                 entries.forEach(function(Entry) {
                     //console.log(Entry.Value);
                     if(Entry.Value == 1) {
@@ -38,16 +46,9 @@
 
 
             var data = [[180, 400], [280, 400], [380, 400],[480, 400],[580, 400],[680, 400],[780, 400]];
-            // var data = [[180, 400], [580, 400],[680, 400],[480, 400], [780, 400],[280, 400],[380, 400]];
             var svg = d3.select("body").append("svg")
                 .attr("width", 960)
                 .attr("height", 500);
-            // var lineGenerator = d3.line();
-            // // var circleGenerator = d3.circle();
-            // var pathString = lineGenerator(data);
-
-            // d3.select('path')
-            //     .attr('d', pathString);
 
             var path = svg.append("path")
                 .data([data])
@@ -57,18 +58,18 @@
             svg.selectAll(".point")
                 .data(data)
                 .enter().append("circle")
-                .attr("r", 4)
+                .attr("r", 5)
                 .attr("transform", function(d) { return "translate(" + d + ")"; });
 
             var circle = svg.append("circle")
-                .attr("r", 13)
+                .attr("r", 5)
                 .attr("transform", "translate(" + data[0] + ")")
                 
             
-            transition();
-            function transition() {
+            // transition();
+            function transition(step) {
                 circle.transition()
-                    .duration(10000)
+                    .duration(3000)
                     .attrTween("transform", translateAlong(path.node()))
                     // .each("end", transition)
                     .each("end", function() {setInterval(ping, 500);})
@@ -80,18 +81,19 @@
                 var l = path.getTotalLength();
                 return function(d, i, a) {
                     return function(t) {
-                    var p = path.getPointAtLength(t * l);
+                        var p = path.getPointAtLength(t * l);
                     return "translate(" + p.x + "," + p.y + ")";
                     };
                 };
             }
 
             function ping() {
-                // svg.append('circle')
-                    circle.
-                    transition()
-                    .remove()
+                var translate = d3.transform(circle.attr('transform'));
+                svg.append('circle')
+                    .transition()
                     .attr({
+                        'cx': translate.translate[0],
+                        'cy': translate.translate[1],
                         'r': 1,
                         'stroke': 'red',
                         'stroke-opacity': 1,
@@ -99,72 +101,17 @@
                         // "transform": "translate(" + data[0] + ")"
                     })
                     .transition()
-                        .duration(3000)
-                        .attr({
+                    .duration(3000)
+                    .attr({
                         'fill': 'none',
-                        'r': 80,
+                        'r': 60,
                         'stroke': '#369',
                         'stroke-width': '0px',
-                        'stroke-opacity': 0
-                        })
+                        'stroke-opacity': 0,
+                        'class' : 'finised'
+                    })
                 };
-
-            // setInterval(ping, 500);
-
-            // var points = [
-            //     [480, 200],
-            //     [580, 400],
-            //     [680, 100],
-            //     [780, 300],
-            //     [180, 300],
-            //     [280, 100],
-            //     [380, 400]
-            // ];
-
-            // var svgContainer = d3.select("#app").append("svg")
-            //     .attr("width", 960)
-            //     .attr("height", 400);
-
-            // //Draw the line
-            // var circle = svgContainer.append("line")
-            //         .attr("x1", 0)
-            //         .attr("y1", 200)
-            //         .attr("x2", 600)
-            //         .attr("y2", 200)
-            //         .attr("stroke-width", 1)
-            //         .attr("stroke", "black");
-
-            // var circle1 = svgContainer.append("circle")
-            //         .attr("cx", 5)
-            //         .attr("cy", 200)
-            //         .attr('fill', 'white')
-            //         .attr("stroke-width", 1)
-            //         .attr("stroke", "black")
-            //         .attr("r", 5);
-
-            // var circle2 = svgContainer.append("circle")
-            //         .attr("cx", 200)
-            //         .attr("cy", 200)
-            //         .attr('fill', 'white')
-            //         .attr("stroke-width", 1)
-            //         .attr("stroke", "black")
-            //         .attr("r", 5);
-        
-            // var circle3 = svgContainer.append("circle")
-            //         .attr("cx", 400)
-            //         .attr("cy", 200)
-            //         .attr("r", 5)
-            //         .attr("stroke-width", 1)
-            //         .attr("stroke", "black")
-            //         .attr('fill', 'white');
-
-            // var circle4 = svgContainer.append("circle")
-            //         .attr("cx", 600)
-            //         .attr("cy", 200)
-            //         .attr("r", 5)
-            //         .attr("stroke-width", 1)
-            //         .attr("stroke", "black")
-            //         .attr('fill', 'white');
+                var pingInterval = setInterval(ping, 300);
         });
     </script>
   </body>
