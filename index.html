@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
   <head>
-    <title>Socket.IO chat</title>
+    <title>D3js, React, and Socket.io</title>
     <style>
         path {
             fill: none;
@@ -37,7 +37,7 @@
             });
 
 
-            var data = [[480, 200],[580, 400],[680, 100],[780, 300],[180, 300],[280, 100],[380, 400]];
+            var data = [[180, 400], [280, 400], [380, 400],[480, 400],[580, 400],[680, 400],[780, 400]];
             // var data = [[180, 400], [580, 400],[680, 400],[480, 400], [780, 400],[280, 400],[380, 400]];
             var svg = d3.select("body").append("svg")
                 .attr("width", 960)
@@ -62,13 +62,17 @@
 
             var circle = svg.append("circle")
                 .attr("r", 13)
-                .attr("transform", "translate(" + data[0] + ")");
+                .attr("transform", "translate(" + data[0] + ")")
+                
+            
             transition();
             function transition() {
                 circle.transition()
                     .duration(10000)
                     .attrTween("transform", translateAlong(path.node()))
-                    .each("end", transition);
+                    // .each("end", transition)
+                    .each("end", function() {setInterval(ping, 500);})
+                    .each("start", function() {clearInterval(ping, 500);});
             }
 
             // Returns an attrTween for translating along the specified path element.
@@ -81,6 +85,31 @@
                     };
                 };
             }
+
+            function ping() {
+                // svg.append('circle')
+                    circle.
+                    transition()
+                    .remove()
+                    .attr({
+                        'r': 1,
+                        'stroke': 'red',
+                        'stroke-opacity': 1,
+                        'stroke-width': '3px',
+                        // "transform": "translate(" + data[0] + ")"
+                    })
+                    .transition()
+                        .duration(3000)
+                        .attr({
+                        'fill': 'none',
+                        'r': 80,
+                        'stroke': '#369',
+                        'stroke-width': '0px',
+                        'stroke-opacity': 0
+                        })
+                };
+
+            // setInterval(ping, 500);
 
             // var points = [
             //     [480, 200],
