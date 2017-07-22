@@ -60,7 +60,7 @@ class Chart extends React.Component {
         svg.selectAll(`.station${this.props.pathId}`)
             .data(route)
             .enter().append("circle")
-            .attr("r", 7)
+            .attr("r", 10)
             .attr("class", (Entry, index) => { let Station = Object.values(this.props.route)[index]; return `station station-${Object.keys(Station)[0]}` })
             .attr("transform", function(d) { return `translate(${d})`; });
         
